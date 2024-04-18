@@ -533,4 +533,4 @@ async def on_ready():
 	print("task.result() => ", task.result())
 
 
-bot.run(bot_tokens[3], bot=True)
+bot.run(bot_tokens[3])
