@@ -112,6 +112,27 @@ class QueueTextPrinting(threading.Thread):
 loop_names = ["выкл", "очередь", "текущее"]
 	
 class QueueViewController(disnake.ui.View):
+	def __init__(self, queue_controller, interaction, indent=10, timeout=None):
+		super().__init__(timeout=timeout)
+		self._queue_controller = queue_controller
+		self._interaction = interaction
+		type(self)._indent = SharedOptions.instance.ctx_getter("default_queue_cut")
+
+		self._print_start_index = 0
+		self._text_printing = QueueTextPrinting.instance
+		self._formatted_text = ""
+		self._prev_selected_item = None
+		self._items = []
+		self._current_index = 0
+		self._is_unsorted = False
+
+		self._buttons = {}
+		if True:
+			self._prepare_extended_ui()
+		else:
+			self._prepare_default_ui()
+
+		#self._enter_index_modal.callback = self.index_modal_sumbited
 	def _add_button(self, callback, key, *args, **kvargs):
 		button = disnake.ui.Button(*args, **kvargs)
 		button.callback = callback
@@ -177,28 +198,6 @@ class QueueViewController(disnake.ui.View):
 
 		url_input = disnake.ui.TextInput(label="url", custom_id="url")
 		self._add_item_modal = CustomModal(callback=self.add_item_modal_sumbited, title="add item", components=url_input)
-
-	def __init__(self, queue_controller, interaction, indent=10, timeout=None):
-		super().__init__(timeout=timeout)
-		self._queue_controller = queue_controller
-		self._interaction = interaction
-		type(self)._indent = SharedOptions.instance.ctx_getter("default_queue_cut")
-
-		self._print_start_index = 0
-		self._text_printing = QueueTextPrinting.instance
-		self._formatted_text = ""
-		self._prev_selected_item = None
-		self._items = []
-		self._current_index = 0
-		self._is_unsorted = False
-
-		self._buttons = {}
-		if True:
-			self._prepare_extended_ui()
-		else:
-			self._prepare_default_ui()
-
-		#self._enter_index_modal.callback = self.index_modal_sumbited
 	def echo(self):
 		# self._text_printing.add_job(self._interaction.edit_original_response(content=self._formatted_text, view=self)).result()
 		self._client.loop.create_task(self.aecho())
