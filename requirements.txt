@@ -1,0 +1,7 @@
+disnake[voice]
+requests
+youtube_dl
+Pillow
+numpy
+scipy
+PyNaCl~=1.4.0

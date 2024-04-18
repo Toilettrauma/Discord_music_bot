@@ -1,0 +1,4 @@
+auto_queue_clear:0
+dj_role_enable:0
+default_af:none
+default_queue_cut:14
