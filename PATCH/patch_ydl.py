@@ -34,3 +34,4 @@ if __name__ == "__main__":
 	os.rename(os.path.join(ydl_path, "youtube_patched.py"), os.path.join(ydl_path, "youtube.py"))
 
 	print("SUCCESS: patched")
+	input()
