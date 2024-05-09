@@ -23,7 +23,7 @@ if __name__ == "__main__":
 			if "'uploader_id': self._search_regex(r'/(?:channel|user)" in line:
 				print("PATCH: uploader_id")
 				uploader_id_patched = True
-				line = line.replace("(?:channel|user)/", "@")
+				line = line.replace("(?:channel|user)/", "(?:channel/|user/|@)")
 			out_fp.write(line)
 
 	if not uploader_id_patched:

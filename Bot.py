@@ -416,22 +416,26 @@ async def save(interaction, name : str = "auto"):
 	queue_controller = await queue_controller_from_interaction(interaction)
 	if queue_controller is None:
 		return
-	with open(f"queues/{name}.txt", "w", encoding="utf16") as f:
-		# header
-		f.write("{item};{time};{filters}\n".format(
-			item = queue_controller.get_current_index(),
-			time = int(queue_controller.get_played_time()),
-			filters = queue_controller.get_af_opts()
-		))
+	try:
+		with open(f"queues/{name}.txt", "w", encoding="utf16") as f:
+			# header
+			f.write("{item};{time};{filters}\n".format(
+				item = queue_controller.get_current_index(),
+				time = int(queue_controller.get_played_time()),
+				filters = queue_controller.get_af_opts()
+			))
 
-		for url, (name, duration) in zip(queue_controller.enum_urls(), queue_controller.enum_view_items()):
-			# print(url)
-			name = name.replace("\n", "")
-			f.write(f"{url};{name};{int(duration)}\n")
+			for url, (name, duration) in zip(queue_controller.enum_urls(), queue_controller.enum_view_items()):
+				# print(url)
+				name = name.replace("\n", "")
+				f.write(f"{url};{name};{int(duration)}\n")
+	except OSError as e:
+		print("Failed to save queue.", e)
+		return
 	await interaction.send("saved")
 
 def restore_autocompleter(interaction, user_input):
-	return [os.path.splitext(file)[0] for file in os.listdir("./queues") if file.startswith(user_input)]
+	return [os.path.splitext(file)[0] for file in os.listdir("./queues") if file.startswith(user_input) and not file.startswith(".")]
 
 @bot.slash_command()
 async def restore(interaction, name : str = commands.Param(default="auto", autocomplete=restore_autocompleter)):
@@ -464,13 +468,27 @@ async def restore(interaction, name : str = commands.Param(default="auto", autoc
 
 	except FileNotFoundError:
 		print("Restore file not found")
+		return
 	except Exception as e:
 		print("Failed to restore.")
 		print(traceback.format_exec(e))
-	finally:
-		queue_controller.play()
-		await queue_controller.update_interaction(interaction)
-		await interaction.edit_original_response("restored")
+		return
+
+	queue_controller.play()
+	await queue_controller.update_interaction(interaction)
+	await interaction.edit_original_response("restored")
+
+@bot.slash_command()
+async def remove_save(interaction, name : str = commands.Param(autocomplete=restore_autocompleter)):
+	await interaction.response.defer(with_message=False)
+
+	try:
+		os.remove(f"queues/{name}.txt")
+	except OSError:
+		print("Failed to delete queue")
+		return
+
+	await interaction.send(f"Removed queue {name}")
 
 print(afsaasd)
 
@@ -533,4 +551,4 @@ async def on_ready():
 	print("task.result() => ", task.result())
 
 
-bot.run(bot_tokens[3])
+bot.run(bot_tokens[4])
