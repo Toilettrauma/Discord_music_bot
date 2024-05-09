@@ -13,7 +13,7 @@ from MutableTime import HourlessTime, RelativeTime
 from View import CustomModal
 from TextQueueController import QueueController
 from Logger import Logger
-from Secrets import bot_tokens, test_guilds
+from Secrets import bot_tokens, test_guilds, token_index
 
 import threading
 import traceback
@@ -551,4 +551,4 @@ async def on_ready():
 	print("task.result() => ", task.result())
 
 
-bot.run(bot_tokens[4])
+bot.run(bot_tokens[token_index])
