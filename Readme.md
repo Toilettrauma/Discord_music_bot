@@ -20,6 +20,5 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 3. (Optional) place `cookies.txt` for youtube_dl (NETSCAPE)
-4. (Optional) run `ydl_patch.py` in PATCH folder. Required to play music from youtube.com
-5. Rename `Secrets.py.placeholder` to `Secrets.py` and fill it with your data
-6. Run `Bot.py`
+4. Rename `Secrets.py.placeholder` to `Secrets.py` and fill it with your data
+5. Run `Bot.py`

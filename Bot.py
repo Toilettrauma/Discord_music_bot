@@ -49,6 +49,8 @@ async def queue_controller_from_interaction(interaction, auto_create=False):
 		voice = await channel.connect()
 		#	await voice.disconnect()
 		queue_controller = queue_controllers[interaction.guild.id] = QueueController(channel, voice, interaction)
+	if not auto_create:
+		return None
 	if not queue_controller.connected:
 		try:
 			voice = await interaction.author.voice.channel.connect()
@@ -434,11 +436,11 @@ async def save(interaction, name : str = "auto"):
 		return
 	await interaction.send("saved")
 
-def restore_autocompleter(interaction, user_input):
+def list_queue_autocompletion(interaction, user_input):
 	return [os.path.splitext(file)[0] for file in os.listdir("./queues") if file.startswith(user_input) and not file.startswith(".")]
 
 @bot.slash_command()
-async def restore(interaction, name : str = commands.Param(default="auto", autocomplete=restore_autocompleter)):
+async def restore(interaction, name : str = commands.Param(default="auto", autocomplete=list_queue_autocompletion)):
 	await interaction.response.defer(with_message=False)
 	queue_controller = await queue_controller_from_interaction(interaction, auto_create=True)
 	if queue_controller is None:
@@ -471,7 +473,7 @@ async def restore(interaction, name : str = commands.Param(default="auto", autoc
 		return
 	except Exception as e:
 		print("Failed to restore.")
-		print(traceback.format_exec(e))
+		print(traceback.format_exc())
 		return
 
 	queue_controller.play()
@@ -479,7 +481,7 @@ async def restore(interaction, name : str = commands.Param(default="auto", autoc
 	await interaction.edit_original_response("restored")
 
 @bot.slash_command()
-async def remove_save(interaction, name : str = commands.Param(autocomplete=restore_autocompleter)):
+async def remove_saved(interaction, name : str = commands.Param(autocomplete=list_queue_autocompletion)):
 	await interaction.response.defer(with_message=False)
 
 	try:
@@ -516,15 +518,16 @@ async def reconnect(interaction):
 		return
 
 	queue_controller.stop()
-	for voice in bot.voice_clients:
-		if voice.guild.id == interaction.guild.id:
-			print("disconnect")
-			await voice.disconnect()
-			break
+	# for voice in bot.voice_clients:
+	# 	if voice.guild.id == interaction.guild.id:
+	# 		print("disconnect")
+	# 		await voice.disconnect()
+	# 		break
 
 	# await queue_controller.update_interaction(interaction)
+	await queue_controller.update_chat(interaction.author.voice.channel)
 	await interaction.delete_original_response()
-	queue_controller.set_voice(await interaction.author.voice.channel.connect())
+	# queue_controller.set_voice(await interaction.author.voice.channel.connect())
 
 test_event_loop = asyncio.new_event_loop()
 def test_loop_main():
