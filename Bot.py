@@ -44,13 +44,13 @@ async def queue_controller_from_interaction(interaction, auto_create=False):
 	global queue_controllers
 	queue_controller = queue_controllers.get(interaction.guild.id)
 	channel = interaction.author.voice.channel
-	if queue_controller is None and auto_create:
+	if queue_controller is None:
+		if not auto_create:
+			return None
 		# while True:
 		voice = await channel.connect()
 		#	await voice.disconnect()
 		queue_controller = queue_controllers[interaction.guild.id] = QueueController(channel, voice, interaction)
-	if not auto_create:
-		return None
 	if not queue_controller.connected:
 		try:
 			voice = await interaction.author.voice.channel.connect()
