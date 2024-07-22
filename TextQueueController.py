@@ -531,6 +531,12 @@ class QueueController:
 		return self._loop
 	async def update_interaction(self, interaction, delete=True):
 		await self._view_controller.update_interaction(interaction, delete=delete)
+	async def update_chat(self, chat):
+		self._chat = chat
+		self.stop()
+		await self._voice.disconnect()
+		self._voice = await self._chat.connect()
+		self.play(replay_url=True)
 	def echo(self):
 		self._view_controller.echo()
 	def refresh(self):
